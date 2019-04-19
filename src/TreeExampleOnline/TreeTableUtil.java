@@ -1,20 +1,12 @@
 /*
- * File: TreeTableUtil.java
- * Author: Kyle A. Roberson kylerob@uab.edu
- * Assignment:  GroupProject - EE333 Spring 2019
- * Vers: 1.0.0 04/16/2019 KAR - initial coding
- *
- * Credits:  (if any for sections of code)
- */
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * File: .java
+ * Author: Caleb J Rudolph rudolph2@uab.edu
+ * Assignment:  - EE333 Spring 2019
+ * Vers: 1.0.0 01/14/2019 cjr - initial coding
  */
 package TreeExampleOnline;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
+
 
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -35,6 +27,7 @@ public class TreeTableUtil
 		Item group3 = new Item("Den", "White");
 		Item group4 = new Item("Master Bedroom", "White");
                 Item group5 = new Item("Living Room", "White");
+                Item groupAllBulbs = new Item ("All Bulbs" , "White");
 
 		//Creates Bulbs
 		Item bulb1 = new Item("Bulb-1", "White");
@@ -61,10 +54,11 @@ public class TreeTableUtil
                 TreeItem<Item> group5Node = new TreeItem<>(group5);
                 group5Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb1),new TreeItem<>(bulb5));
                 
+                TreeItem<Item> groupAllBulbsNode = new TreeItem<> (groupAllBulbs);
 
 		// Create the root node and add children
 		TreeItem<Item> rootNode = new TreeItem<>(person1);
-		rootNode.getChildren().addAll(group1Node, group2Node, group3Node,group4Node, group5Node);
+		rootNode.getChildren().addAll(group1Node, group2Node, group3Node,group4Node, group5Node,groupAllBulbsNode);
                 
 
 		return rootNode;
@@ -88,6 +82,22 @@ public class TreeTableUtil
 		return ColorCol;
 	}
 
+        /* Returns Color Name TreeTableColumn */
+	public static TreeTableColumn<Item, String> getComboColumn()
+	{
+		TreeTableColumn<Item, String> ComboCol = new TreeTableColumn<>("On/Off");
+		ComboCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("On/Off"));
+		return ComboCol;
+	}
+        
+        
+         /* Returns Color Name TreeTableColumn */
+	public static TreeTableColumn<Item, String> getComboColumnBrightness()
+	{
+		TreeTableColumn<Item, String> ComboBrightnessCol = new TreeTableColumn<>("Brightness");
+		ComboBrightnessCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("Brightness"));
+		return ComboBrightnessCol;
+	}
 	
 
 }
