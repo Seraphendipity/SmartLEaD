@@ -19,22 +19,22 @@ public class TreeTableUtil
 	{
             
 		//Creates Root
-		Item person1 = new Item("Groups", "");
+		Item person1 = new Item("Groups");
 
 		// Creates Groups
-		Item group1 = new Item("Patio", "White");
-		Item group2 = new Item("Garage", "White");
-		Item group3 = new Item("Den", "White");
-		Item group4 = new Item("Master Bedroom", "White");
-                Item group5 = new Item("Living Room", "White");
-                Item groupAllBulbs = new Item ("All Bulbs" , "White");
+		Item group1 = new Item("Patio");
+		Item group2 = new Item("Garage");
+		Item group3 = new Item("Den");
+		Item group4 = new Item("Master Bedroom");
+                Item group5 = new Item("Living Room");
+                Item groupAllBulbs = new Item ("All Bulbs");
 
 		//Creates Bulbs
-		Item bulb1 = new Item("Bulb-1", "White");
-		Item bulb2 = new Item("Bulb-2", "White");
-		Item bulb3 = new Item("Bulb-3", "White");
-		Item bulb4 = new Item("Bulb-4", "White");
-		Item bulb5 = new Item("Bulb-5", "White");
+		Item bulb1 = new Item("Bulb-1");
+		Item bulb2 = new Item("Bulb-2");
+		Item bulb3 = new Item("Bulb-3");
+		Item bulb4 = new Item("Bulb-4");
+		Item bulb5 = new Item("Bulb-5");
 
 		
 

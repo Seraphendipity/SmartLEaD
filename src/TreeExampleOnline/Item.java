@@ -1,56 +1,64 @@
-/*
- * File: .java
- * Author: Caleb J Rudolph rudolph2@uab.edu
- * Assignment:  - EE333 Spring 2019
- * Vers: 1.0.0 01/14/2019 cjr - initial coding
- */
 package TreeExampleOnline;
 
+public class Item {
+    protected int uid;
+    protected String name;
+    protected Boolean bOn = false;
+    protected int brightness = 70;
+    protected String color = "White";
+    protected static int serialCounter = 0;
 
+    public Item() {
+        this.uid = serialCounter++;
+        this.name = "Item_" + this.uid;
+    }
 
+    public Item(String newName) {
+        new Item();
+        this.name = newName;
+    }
 
-public class Item
-{
-	// Declaring the attributes page 424
-	private String Name;
-	private String Color;
-       
-       
+    public String toString() {
+        return "Bulb{uid=" + this.uid + ", name=" + this.name + ", bOn=" + this.bOn + ", brightness=" + this.brightness + ", color=" + this.color + "}";
+    }
 
-	
+    public int getUid() {
+        return this.uid;
+    }
 
-	public Item(String Name, String Color)
-	{
-		this.Name = Name;
-		this.Color = Color;
-             
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public String getName()
-	{
-		return Name;
-	}
+    public Boolean getStatus() {
+        return this.bOn;
+    }
 
-	public void setName(String Name)
-	{
-		this.Name = Name;
-	}
+    public int getBrightness() {
+        return this.brightness;
+    }
 
-	public String getColor()
-	{
-		return Color;
-	}
+    public String getColor() {
+        return this.color;
+    }
 
-	public void setColor(String Color)
-	{
-		this.Color = Color;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String toString()
-	{
-		return Name + " " + Color + ", " ;
-	}
+    public void turnOn() {
+        this.bOn = true;
+    }
 
-	
+    public void turnOff() {
+        this.bOn = false;
+    }
+
+    public void setBrightness(int brightness) {
+        this.brightness = brightness = brightness > 100 ? 100 : (brightness < 0 ? 0 : brightness);
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 }
