@@ -30,16 +30,17 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.geometry.Insets;
 
 public class FxTreeTableViewExample7 extends Application {
     // Create the TreeTableView
-
+    private String allGroupName = "Misc. Bulbs";
     private final TreeTableView<Item> treeTable = new TreeTableView<>();
     // Create a TextArea
     private final TextArea textarea = new TextArea();
-    
+
     //ArrayList of Bulbs
-        List<String> allbulbs =  new ArrayList( );
+    ArrayList<TreeItem<Bulb>> freeBulbsArr = new ArrayList();
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -50,15 +51,11 @@ public class FxTreeTableViewExample7 extends Application {
         // Create the Root Node
         TreeItem<Item> rootNode = TreeTableUtil.getModel();
         rootNode.setExpanded(true);
-
-        // Set the Properties of the Root Node
         treeTable.setRoot(rootNode);
         rootNode.setExpanded(true);
         treeTable.setPrefWidth(480);
         treeTable.setEditable(true);
         treeTable.getSelectionModel().selectFirst();
-        
-        
 
         // Create Columns with Cell Factories
         TreeTableColumn<Item, String> NameColumn = TreeTableUtil.getNameColumn();
@@ -70,39 +67,33 @@ public class FxTreeTableViewExample7 extends Application {
             public TreeTableCell<Item, String> call(TreeTableColumn<Item, String> param) {
                 TreeTableCell<Item, String> cell = new TreeTableCell<Item, String>() {
                     private ColorPicker colorPicker = new ColorPicker();
-
                     @Override
                     protected void updateItem(String item, boolean empty) {
                         super.updateItem(item, empty);
                         if (empty) {
                             setGraphic(null);
                         } else {
-
                             setGraphic(colorPicker);
                             colorPicker.setValue(Color.WHITE);
-
+                            //TODO: Add set color to item
                         }
-
                     }
                 };
                 return cell;
             }
         });
-        
+
         //*******Possibly how to link gui to backend values*************
-        ColorColumn.setOnEditCommit(e ->{
-         TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-         int rowIndex = sm.getSelectedIndex();
-         TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-          sm.getSelectedItem().getValue().setColor(ColorColumn.getCellData(selectedItem));
+        ColorColumn.setOnEditCommit(e -> {
+            TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
+            TreeItem<Item> selectedItem = getSelectedItem();
+            getSelectedItem().getValue().setColor(ColorColumn.getCellData(selectedItem));
         });
-        
-        
-        
+
         ObservableList<String> list = FXCollections.observableArrayList();
         list.add("On");
         list.add("Off");
-        TreeTableColumn<Item, String> ComboColumn = TreeTableUtil.getComboColumn();
+        TreeTableColumn<Item, String> ComboColumn = TreeTableUtil.getColumn("State");
         ComboColumn.setCellFactory(new Callback<TreeTableColumn<Item, String>, TreeTableCell<Item, String>>() {
             public TreeTableCell<Item, String> call(TreeTableColumn<Item, String> param) {
                 TreeTableCell<Item, String> cell = new TreeTableCell<Item, String>() {
@@ -114,16 +105,28 @@ public class FxTreeTableViewExample7 extends Application {
                         if (empty) {
                             setGraphic(null);
                         } else {
-
                             setGraphic(combobox);
                             combobox.setValue("On");
 
                         }
                     }
+
                 };
                 return cell;
             }
         });
+        
+        ComboColumn.setOnEditCommit(e ->{
+        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
+            int rowIndex = sm.getSelectedIndex();
+            TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
+            sm.getSelectedItem().getValue().setState(ComboColumn.getCellData(selectedItem));
+        
+        });
+        
+        
+        
+        
 
         ObservableList<String> listBrightness = FXCollections.observableArrayList();
         listBrightness.add("1");
@@ -136,7 +139,7 @@ public class FxTreeTableViewExample7 extends Application {
         listBrightness.add("8");
         listBrightness.add("9");
         listBrightness.add("10");
-        TreeTableColumn<Item, String> ComboBrightnessColumn = TreeTableUtil.getComboColumnBrightness();
+        TreeTableColumn<Item, String> ComboBrightnessColumn = TreeTableUtil.getBrightnessColumn();
         ComboBrightnessColumn.setCellFactory(new Callback<TreeTableColumn<Item, String>, TreeTableCell<Item, String>>() {
             public TreeTableCell<Item, String> call(TreeTableColumn<Item, String> param) {
                 TreeTableCell<Item, String> cell = new TreeTableCell<Item, String>() {
@@ -157,20 +160,30 @@ public class FxTreeTableViewExample7 extends Application {
                 return cell;
             }
         });
+        
+        ComboBrightnessColumn.setOnEditCommit(e ->{
+        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
+            int rowIndex = sm.getSelectedIndex();
+            TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
+            sm.getSelectedItem().getValue().setBrightness(ComboBrightnessColumn.getCellData(selectedItem));
+        
+        });
+        
+        
+        
 
         // Add Columns to The TreeTableView
         treeTable.getColumns().add(NameColumn);
         treeTable.getColumns().add(ColorColumn);
         treeTable.getColumns().add(ComboColumn);
         treeTable.getColumns().add(ComboBrightnessColumn);
-       
 
         // Add a placeholder to the TreeTableView.
         // It is displayed when the root node is deleted.
         treeTable.setPlaceholder(new Label("Click the Add button to add a row."));
 
         // Create the Label
-        Label label = new Label("Please select a group or bulb to add/delete.");
+        Label label = new Label("  Please select a group or bulb to add/delete.");
 
         // Create the HBox
         HBox hbox = this.getButtons();
@@ -192,8 +205,7 @@ public class FxTreeTableViewExample7 extends Application {
         root.getChildren().add(groupLabel);
         // Display the Stage
         stage.show();
-        
-        
+
     }
 
     private HBox getButtons() {
@@ -207,6 +219,7 @@ public class FxTreeTableViewExample7 extends Application {
             public void handle(ActionEvent event) {
                 addRow();
             }
+
         });
 
         deleteButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -216,169 +229,96 @@ public class FxTreeTableViewExample7 extends Application {
             }
         });
 
-        // Create and return the HBox
-        return new HBox(20, addButton, deleteButton);
+        Insets buttonInset = new Insets(0, 0, 0, 6.5);
+        HBox hb = new HBox(20, addButton, deleteButton);
+        hb.setPadding(buttonInset);
+        return hb;
     }
 
     private void addRow() {
-        if (treeTable.getExpandedItemCount() == 0) {
-            // There is no row in the TreeTableView
-            addNewRootItem();
-        } else if (treeTable.getSelectionModel().isEmpty()) {
-            logging("Select a row to add.");
+        TreeItem<Item> sItem = getSelectedItem(); //gets selected item
+        int sLevel = this.treeTable.getTreeItemLevel(sItem);
+        if (sLevel == 2) {
+            //Bulb Selected, add bulb to group/change groups
+            String newParent = Popup.addBulbToGroup(getNameList(getGroups()));
+            changeBulbParent(getGroupByName(newParent));
             
-        } else if (treeTable.getTreeItemLevel(treeTable.getSelectionModel().getSelectedItem()) == 2) {
-            //Bulb level item selected, do nothing, items cannot be added to bulbs
-            
-
-        } else if (treeTable.getTreeItemLevel(treeTable.getSelectionModel().getSelectedItem()) == 1
-                && treeTable.getSelectionModel().getSelectedItem().getValue().getName().equals("All Bulbs")) {
-            //Item Selescted is the All Bulbs Group 
-            // Adding a bulb to the system by displaying a pop up where the user gives the name of bulb and the 
-            //UID of the bulb. Returns a String of the name and adds that to the All Bulbs Group and also
-            //adds the name to a list of strings that is used for the add to group combobox
-             String n = PopupBulb.display("Add New Bulb");
-             if ("".equals(n)){
-             //do nothing
-             }else{
-             addNewToSystemChildItemBulb(n);
-             allbulbs.add(n);
-             }
-        } else if (treeTable.getTreeItemLevel(treeTable.getSelectionModel().getSelectedItem()) == 1) {
-            //Item Selected is a Group
-            //Adding a Bulb to a group by giving a popup to the user with all the bulbs in the system. This is
-            //done by passing the list allbulbs as on of parameters of the argument for the popup method, that way
-            //an up to date list is generated in the combobox, Then creates a tree item using the string name of the bulb selected
-            String n = PopupAddBulbToGroup.display("Add Bulb to Group",allbulbs);
-            addBulbToGroupChildItem(n);
-            allbulbs.remove(n);
-            //also remove bulb from "all bulb"
-        } else if (treeTable.getTreeItemLevel(treeTable.getSelectionModel().getSelectedItem()) == 0) {
-            //Item Selected is Groups (Root)
-            //Prompts the User with one popup for creating a group by giving a name for the group
-            //if they enter nothing it does nothing
-            //If they enter a name they are further prompted to add a bulb to the system by selecting on
-            //from a combobox
-            String n = PopupNewGroup.display("Add Group");
-            if ("".equals(n)){
-             //do nothing
-             }else{
-             addGroupToRootChildItemBulb(n);
-             String x = PromptToAddBulbToNewGroupPopup.display("Add Bulb to New Group",allbulbs);
-             addBulbToGroupChildItem(x);
-             
-             }
-            
+        } else if (sLevel == 1) {
+            //Group Selected
+            if ( sItem.getValue().getName().equals(this.allGroupName) ) {
+                //Misc. Bulb Group selected, Add bulb to System
+                String s = Popup.addBulbToHub();
+                this.createItem(s);
+            } else {
+                //Group selected, add to the group a bulb from misc. bulbs
+                String n = Popup.addToGroupBulb(getListNames(getFreeBulbs()));
+                this.addBulbToGroup(getItemByName(s));
+            }           
+        } else if (sLevel == 0) {
+            //Root Selected, create new group
+            String newGroupName = Popup.createNewGroup();
+            this.createItem(newGroupName);
         } else {
-            // Add Child
-            addNewChildItem();
+            this.log("ERR103: Unknown add case, contact elirose@uab.edu.");
         }
+    }
+        
+    private void createItem() {
+        TreeItem<Item> selectedItem = this.getSelectedItem();
+        TreeItem item = null;
+        switch (this.treeTable.getTreeItemLevel(selectedItem)) {
+            case 1: {
+                item = new TreeItem((Object)new Bulb());
+                break;
+            }
+            case 0: {
+                item = new TreeItem((Object)new Group());
+                break;
+            }
+            default: {
+                this.log("ERR101: Invalid command, contact elirose@uab.edu.");
+            }
+        }
+        selectedItem.getChildren().add(item);
+        this.editItem(item);
+    }
+        
+    private void createItem(String name) {
+        this.createItem();
+        ((Item)this.getSelectedItem().getValue()).setName(name);
     }
 
     private void addNewRootItem() {
         // Add a root Item
-        TreeItem<Item> item = new TreeItem<>(new Item("Groups", ""));
+        TreeItem<Item> item = new TreeItem<>(new Item("Groups"));
         treeTable.setRoot(item);
 
         // Edit the item
         this.editItem(item);
     }
 
-    private void addNewChildItem() {
 
-        // Prepare a new TreeItem with a new Item object
-        TreeItem<Item> item = new TreeItem<>(new Item("New", "New"));
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        // Get the selected row index
-        int rowIndex = sm.getSelectedIndex();
-        // Get the selected TreeItem
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        // Add the new item as children to the selected item
-        selectedItem.getChildren().add(item);
-        // Make sure the new item is visible
-        selectedItem.setExpanded(true);
-        // Edit the item
-        this.editItem(item);
+    private void addBulbToGroup(TreeItem<Bulb> bulb) {
+        TreeItem<Item> group = this.getSelectedItem();
+        this.addBulbToGroup(bulb, group);
     }
 
-    private void addNewChildItemGroup() {
-
-        // Prepare a new TreeItem with a new Item object
-        TreeItem<Item> item = new TreeItem<>(new Item("New Group", "White"));
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        // Get the selected row index
-        int rowIndex = sm.getSelectedIndex();
-        // Get the selected TreeItem
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        // Add the new item as children to the selected item
-        selectedItem.getChildren().add(item);
-        // Make sure the new item is visible
-        selectedItem.setExpanded(true);
-        // Edit the item
-        this.editItem(item);
+    private void addBulbToGroup(TreeItem<Bulb> bulb, TreeItem<Group> group) {
+        group
+        group.getChildren().add(bulb);
+        group.setExpanded(true);
     }
 
-
-    
-    private void addNewToSystemChildItemBulb(String Name) {
-
-        // Prepare a new TreeItem with a new Item object
-        TreeItem<Item> item = new TreeItem<>(new Item( Name, "White"));
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        // Get the selected row index
-        int rowIndex = sm.getSelectedIndex();
-        // Get the selected TreeItem
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        // Add the new item as children to the selected item
-        selectedItem.getChildren().add(item);
-        // Make sure the new item is visible
-        selectedItem.setExpanded(true);
-        // Edit the item
-        this.editItem(item);
-    }
-    
-     private void addGroupToRootChildItemBulb(String Name) {
-
-        // Prepare a new TreeItem with a new Item object
-        TreeItem<Item> item = new TreeItem<>(new Item( Name, "White"));
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        // Get the selected row index
-        int rowIndex = sm.getSelectedIndex();
-        // Get the selected TreeItem
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        // Add the new item as children to the selected item
-        selectedItem.getChildren().add(item);
-        // Make sure the new item is visible
-        selectedItem.setExpanded(true);
-        // Edit the item
-        this.editItem(item);
-    }
-    
-    
-    
-    
-     private void addBulbToGroupChildItem(String Name) {
-
-        // Prepare a new TreeItem with a new Item object
-        TreeItem<Item> item = new TreeItem<>(new Item( Name, "White"));
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        // Get the selected row index
-        int rowIndex = sm.getSelectedIndex();
-        // Get the selected TreeItem
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        // Add the new item as children to the selected item
-        selectedItem.getChildren().add(item);
-        // Make sure the new item is visible
-        selectedItem.setExpanded(true);
-        // Edit the item
-        this.editItem(item);
+    private void changeBulbParent(TreeItem<Bulb> bulb, TreeItem<Group> newParent) {
+        this.deleteRow(bulb);
+        this.addBulbToGroup(bulb, newParent);
     }
 
+    private void changeBulbParent(TreeItem<Group> newParent) {
+        TreeItem<Item> bulb = this.getSelectedItem();
+        this.changeBulbParent(bulb, newParent);
+    }
+    
     private void editItem(TreeItem<Item> item) {
         // Scroll to the new item
         int newRowIndex = treeTable.getRow(item);
@@ -390,32 +330,62 @@ public class FxTreeTableViewExample7 extends Application {
         treeTable.getFocusModel().focus(newRowIndex, firstCol);
         treeTable.edit(newRowIndex, firstCol);
     }
-
+    
     private void deleteRow() {
-        // Get the selection model
-        TreeTableViewSelectionModel<Item> sm = treeTable.getSelectionModel();
-        if (sm.isEmpty()) {
-            logging("Select a row to delete.");
-            return;
-        }
-
-        // Get the selected Entry
-        int rowIndex = sm.getSelectedIndex();
-        TreeItem<Item> selectedItem = sm.getModelItem(rowIndex);
-        TreeItem<Item> parent = selectedItem.getParent();
-
-        if (parent != null && !sm.getSelectedItem().getValue().getName().equals("All Bulbs")) {
-            // Remove the Item
-            parent.getChildren().remove(selectedItem);   
-        } else  {
-            // Must be deleting the Root Item
-            //treeTable.setRoot(null);
-        }
+        TreeItem<Item> selectedItem = this.getSelectedItem();
+        this.deleteRow(selectedItem);
     }
 
-    private void logging(String message) {
+    private void deleteRow(TreeItem<Item> selectedItem) {
+        if (selectedItem != null) {
+            TreeItem parent = selectedItem.getParent();
+            Boolean bAllgroup = ((Item)selectedItem.getValue()).getName().equals(this.allGroupName);
+            if (parent != null && !bAllgroup.booleanValue()) {
+                parent.getChildren().remove(selectedItem);
+                this.log(((Item)selectedItem.getValue()).getName() + " successfully deleted.");
+            } else if (bAllgroup.booleanValue()) {
+                this.log("Cannot delete " + this.allGroupName + ".");
+            }
+        }
+    }
+    
+    private TreeItem<Item> getSelectedItem() {
+        TreeTableView.TreeTableViewSelectionModel sm = this.treeTable.getSelectionModel();
+        if (sm.isEmpty()) {
+            this.log("Select a row.");
+            return null;
+        }
+        return (TreeItem)sm.getSelectedItem();
+    }
+
+    private TreeItem<Item> getItemByName(String name, ArrayList<TreeItem<Item>> itemsArr) {
+        for (int i = 0; i < itemsArr.size(); ++i) {
+            if (((Item)itemsArr.get(i).getValue()).getName().equals(name)) {
+                return itemsArr.get(i);
+            }
+            ++i;
+        }
+        this.log("ERR104: No item by the name " + name + ".");
+        return null;
+    }
+        
+    private TreeItem<Bulb> getBulbByName(String name) {
+        getItemByName(name, getFreeBulbs());
+    }   
+       
+    private TreeItem<Group> getGroupByName(String name) {
+        getItemByName(name, getGroups());
+    }   
+    
+    private ArrayList<String> getNameList(ArrayList<TreeItem<Item>> itemsArr) {
+        ArrayList<String> L = new ArrayList();
+        for (int i = 0; i > itemsArr.size(); i++) {
+            L.add(itemsArr.get(i).getValue().getName());
+        }
+        return L;
+    }
+       
+    private void log(String message) {
         this.textarea.appendText(message + "\n");
     }
-    
-    
 }

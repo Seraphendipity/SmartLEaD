@@ -67,37 +67,9 @@ public class TreeTableUtil
 	
 
 	/* Returns Name TreeTableColumn */
-	public static TreeTableColumn<Item, String> getNameColumn()
-	{
-		TreeTableColumn<Item, String> NameCol = new TreeTableColumn<>("Name");
-		NameCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("Name"));
+	public static TreeTableColumn<Item, String> getColumn(String s) {
+		TreeTableColumn<Item, String> NameCol = new TreeTableColumn<>(s);
+		NameCol.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
 		return NameCol;
 	}
-
-	/* Returns Color Name TreeTableColumn */
-	public static TreeTableColumn<Item, String> getColorColumn()
-	{
-		TreeTableColumn<Item, String> ColorCol = new TreeTableColumn<>("Color");
-		ColorCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("Color"));
-		return ColorCol;
-	}
-
-        /* Returns Color Name TreeTableColumn */
-	public static TreeTableColumn<Item, String> getComboColumn()
-	{
-		TreeTableColumn<Item, String> ComboCol = new TreeTableColumn<>("On/Off");
-		ComboCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("On/Off"));
-		return ComboCol;
-	}
-        
-        
-         /* Returns Color Name TreeTableColumn */
-	public static TreeTableColumn<Item, String> getComboColumnBrightness()
-	{
-		TreeTableColumn<Item, String> ComboBrightnessCol = new TreeTableColumn<>("Brightness");
-		ComboBrightnessCol.setCellValueFactory(new TreeItemPropertyValueFactory<>("Brightness"));
-		return ComboBrightnessCol;
-	}
-	
-
 }

@@ -21,9 +21,8 @@
  */
 package TreeExampleOnline;
 
-import SmartLEaD.Controller;
-import SmartLEaD.Item;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -39,6 +38,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
 public class Popup extends Controller {
     private static Stage initializePopup(String title) {
@@ -50,7 +50,7 @@ public class Popup extends Controller {
         return window;
     }
 
-    public static String addBulbToGroup(ArrayList<TreeItem<Item>> freeBulbsArr) {
+    public static String addToGroupBulb(ArrayList<TreeItem<Item>> freeBulbsArr) {
         Stage window = Popup.initializePopup("Add Bulb to Group");
         ComboBox bulbsComboBox = new ComboBox();
         for (int i = 0; i > freeBulbsArr.size(); ++i) {
@@ -105,4 +105,45 @@ public class Popup extends Controller {
         String newname = name.getText();
         return newname;
     }
+    
+    public static String addBulbToGroup(List listofgroups) {
+        //Manually sets the stage    
+        Stage window = new Stage();
+
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle("Add Bulb to Group");
+        window.setMinWidth(350);
+        window.setMinHeight(250);
+
+        Label label1 = new Label();
+        label1.setText("Can not create a group from a bulb.");
+        
+        Label label2 = new Label();
+        label2.setText("Would you like to add this bulb to another group?");
+        
+        ComboBox allGroupsInSystemComboBox = new ComboBox();
+        allGroupsInSystemComboBox.getItems().addAll(listofgroups);
+        allGroupsInSystemComboBox.setPromptText("Groups");
+        
+        
+        
+        //Add button closes the window
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> {
+            window.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(label1,label2,allGroupsInSystemComboBox,closeButton);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(layout);
+        window.setScene(scene);
+        window.showAndWait(); 
+        
+        String newname= allGroupsInSystemComboBox.getValue().toString();
+        return newname;
+    }
+
+
 }

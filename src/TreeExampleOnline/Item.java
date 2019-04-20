@@ -21,6 +21,11 @@ public class Item {
     public String toString() {
         return "Bulb{uid=" + this.uid + ", name=" + this.name + ", bOn=" + this.bOn + ", brightness=" + this.brightness + ", color=" + this.color + "}";
     }
+    
+    public String toCsv(String parent) {
+        char c = ','; //delimiter
+        return (this.name + c + this.uid + c + this.bOn + c + this.brightness + c + this.color + c + parent);
+    }
 
     public int getUid() {
         return this.uid;
