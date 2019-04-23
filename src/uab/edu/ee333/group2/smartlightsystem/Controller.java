@@ -38,7 +38,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.geometry.Insets;
+import javafx.scene.control.cell.ComboBoxTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -52,12 +54,15 @@ public class Controller extends Application {
     | | \| |  |  | |  | |___ |  /__ |  |  |  | |__| | \| 
 ______________________________________________________________________________*/
 
-    private TreeItem<Item> allGroup;
-    private String allGroupName;
+    private final TreeTableView<Item> treeTable = new TreeTableView<>();
+    
     private Label dirLabel; // Displays directions up top.
     private Label logLabel; //Displays log at bottom.
-    private final TreeTableView<Item> treeTable = new TreeTableView<>();
-    private final TextArea textarea = new TextArea();
+    private Button addButton;
+    private Button delButton;
+    
+    private TreeItem<Item> allGroup;
+    private String allGroupName;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -82,12 +87,11 @@ ______________________________________________________________________________*/
         | \| |--| |\/| |===
         ----------------------------------*/        
         // NAME
-//        ObservableList<Item> data = 
-        TreeTableView<Item> tableView = new TreeTableView<>();
         
-        TreeTableColumn<Item, String> NameColumn = getColumnString("Name");
-        NameColumn.setCellFactory(TextFieldTreeTableCell.<Item>forTreeTableColumn());
-        NameColumn.setEditable(true);
+        TreeTableColumn<Item, String> nameCol = getColumnString("Name");
+        nameCol.setCellFactory(
+                TextFieldTreeTableCell.<Item>forTreeTableColumn());
+        nameCol.setEditable(false);
 
         
         /*---------------------------------
@@ -95,64 +99,123 @@ ______________________________________________________________________________*/
         |___ [__] |___ [__] |--<
         ----------------------------------*/
         TreeTableColumn<Item, String> ColorColumn = getColumnString("Color");
-        ColorColumn.setCellFactory((TreeTableColumn<Item, String> param) -> {
-            TreeTableCell<Item, String> cell = new TreeTableCell<Item, String>() {
+        int colorColMode = 0; //0 = combobox | 1 = colorPicker | else = custom
+        
+        if (colorColMode == 0) {
+            ObservableList<String> listColors = FXCollections.observableArrayList();
+            listColors.addAll("White", "Black", "Grey", "Red","Blue","Green");
+            ColorColumn.setCellFactory(ComboBoxTreeTableCell.forTreeTableColumn(listColors));
+            
+        } else if (colorColMode == 1) {
+        ColorColumn.setCellFactory( (TreeTableColumn<Item, String> param) -> {
+            TreeTableCell<Item, String> cell = new TreeTableCell<Item,String>(){
                 private ColorPicker colorPicker = new ColorPicker();
+                        
+
+                @Override
+                public void commitEdit(String t) {
+                    super.commitEdit(t); 
+                    //System.out.println("STUFFFFASfjNASJFNFSNAF");
+
+                }
+                
+                @Override
+                public void startEdit() {
+                    super.startEdit(); 
+                    //System.out.println("STUFFFFASfjNASJFNFSNAF");
+
+                }
+                
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty) {
                         setGraphic(null);
                     } else {
+                   // System.out.println("nhemmm");
                         setGraphic(colorPicker);
-                        colorPicker.setValue(Color.WHITE);
-                        
-                        //TODO: Add set color to item
+                        colorPicker.setValue(Color.valueOf(item));
                     }
                 }
+//                
             };
             return cell;
         });
+//                colorPicker.setOnAction(new EventHandler<TreeTableColumn.CellEditEvent<Item, String>>() {
+//                    
+//                    @Override
+//                    public void handle(TreeTableColumn.CellEditEvent<Item, String> t) {
+//                        System.out.println("STUFFFFASfjNASJFNFSNAF");
+//                        t.getRowValue().getValue().setColor(t.getNewValue());
+//                    }
+//                });
+//                        colorPicsetOnAction(new EventHandler<ActionEvent> {
+//                            @Override
+//                            public void handle(ActionEvent e) {
+//                            
+//                        }
+//                        });
+        } else {
+            ColorColumn.setCellFactory(new Callback<TreeTableColumn<Item, String>, TreeTableCell<Item, String>>() {
+                @Override
+                public TreeTableCell<Item, String> call(TreeTableColumn<Item, String> p) {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            });
+        }
+        
+ 
 
-        //*******Possibly how to link gui to backend values*************
-        ColorColumn.setOnEditCommit(e -> {
-            TreeItem<Item> sItem = getSelectedItem();
-            sItem.getValue().setColor(ColorColumn.getCellData(sItem));
+        ColorColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Item, String>>() {
+            @Override
+            public void handle(TreeTableColumn.CellEditEvent<Item, String> t) {
+                //System.out.println("STUFFFFASfjNASJFNFSNAF");
+                t.getRowValue().getValue().setColor(t.getNewValue());
+            }
         });
+//                    e.getRowValue().getValue().setColor("blue");
+        //*******Possibly how to link gui to backend values*************
+//        ColorColumn.setOnEditCommit(e -> {
+//            e.getRowValue().getValue().setColor("red");
+////            TreeItem<Item> sItem = getSelectedItem();
+////            sItem.getValue().setColor(ColorColumn.getCellData(sItem));
+//        });
 
         /*---------------------------------
         ____ ___ ____ ___ _  _ ____
         ====  |  |--|  |  |__| ====
         ----------------------------------*/
+        TreeTableColumn<Item, Boolean> StateColumn = getColumnBoolean("Status");
+        StateColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(StateColumn));
         //STATECOLUMN
 //        ObservableList<String> list = FXCollections.observableArrayList();
-        String sOff = "IO";
-        String sOn = "On ";
-        //Image imgOff = new Image("/bulbOff.png");
-        //Image imgOn = new Image("/bulbOn.png");
-        //ImageView img = new ImageView(imgOff);
-        //C:\Users\Elijah\Documents\CoolBeansProjects\SmartLEaD\src
-        TreeTableColumn<Item, Boolean> StateColumn = getColumnBoolean("Status");
-        StateColumn.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
-            TreeTableCell<Item, Boolean> cell = new TreeTableCell<Item, Boolean>() {
-                private final ToggleButton tButton = new ToggleButton(sOff);
-                
-                @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setGraphic(null);
-                    } else {
-                        setGraphic(tButton);
-                        tButton.setSelected(true);
-                        
-                    }
-                }
-                
-            };
-            return cell;
-        });
+//        String sOff = "Off";
+//        String sOn = "On ";
+//        //Image imgOff = new Image("/bulbOff.png");
+//        //Image imgOn = new Image("/bulbOn.png");
+//        //ImageView img = new ImageView(imgOff);
+//        //C:\Users\Elijah\Documents\CoolBeansProjects\SmartLEaD\src
+//        StateColumn.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
+//            
+//            TreeTableCell<Item, Boolean> cell = new TreeTableCell<Item, Boolean>() {
+//                
+//                
+//                private ToggleButton tButton = new ToggleButton(sOff);
+//                @Override
+//                protected void updateItem(Boolean item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    if (empty) {
+//                        setGraphic(null);
+//                    } else {
+//                        setGraphic(tButton);
+//                        tButton.setSelected(true);
+//                    }
+//                }
+//            };
+//            
+//            
+//            return cell;
+//        });
         
         StateColumn.setOnEditCommit(e ->{
             TreeItem<Item> sItem = getSelectedItem();
@@ -172,30 +235,31 @@ ______________________________________________________________________________*/
             listBrightness.add(i);
         }
         TreeTableColumn<Item, Integer> BrightnessColumn = getColumnInt("Brightness");
-        BrightnessColumn.setCellFactory((TreeTableColumn<Item, Integer> p) -> {
-            TreeTableCell<Item, Integer> cell = new TreeTableCell<Item, Integer>() {
-                private ComboBox comboBrightnessbox = new ComboBox(listBrightness);
-                
-                @Override
-                protected void updateItem(Integer item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setGraphic(null);
-                    } else {
-                        setGraphic(comboBrightnessbox);
-                        comboBrightnessbox.setValue("5");
-                        
-                    }
-                }
-            };
-            return cell;
-        });
+        BrightnessColumn.setCellFactory(ComboBoxTreeTableCell.forTreeTableColumn(listBrightness));
+//        BrightnessColumn.setCellFactory((TreeTableColumn<Item, Integer> p) -> {
+//            TreeTableCell<Item, Integer> cell = new TreeTableCell<Item, Integer>() {
+//                private ComboBox comboBrightnessbox = new ComboBox(listBrightness);
+//                
+//                @Override
+//                protected void updateItem(Integer item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    if (empty) {
+//                        setGraphic(null);
+//                    } else {
+//                        setGraphic(comboBrightnessbox);
+//                        comboBrightnessbox.setValue(5);
+//                        
+//                    }
+//                }
+//            };
+//            return cell;
+//        });
         
-        BrightnessColumn.setOnEditCommit(e ->{
-            TreeItem<Item> sItem = getSelectedItem();
-            sItem.getValue().setBrightness(BrightnessColumn.getCellData(sItem));
-        
-        });
+//        BrightnessColumn.setOnEditCommit(e ->{
+//            TreeItem<Item> sItem = getSelectedItem();
+//            sItem.getValue().setBrightness(BrightnessColumn.getCellData(sItem));
+//        
+//        });
         
         /*---------------------------------
         ____ ___ _  _ ____ ____
@@ -207,7 +271,7 @@ ______________________________________________________________________________*/
             if (newSelection != null) {updateButtons();}                });
 
         // Add Columns to The TreeTableView
-        treeTable.getColumns().addAll(NameColumn, 
+        treeTable.getColumns().addAll(nameCol, 
                                       ColorColumn, 
                                       StateColumn, 
                                       BrightnessColumn);
@@ -232,8 +296,58 @@ ______________________________________________________________________________*/
         // Display the Stage
         stage.show();
     }
-    //private void MouseEvent(Object newValue) {
+    
+        /*---------------------------------
+        ____ ____ ___ ____ ____ _    _  _ _  _ __ _
+        |__, |===  |  |___ [__] |___ |__| |\/| | \|
+        ----------------------------------*/
+    
+        private static TreeTableColumn<Item, String> getColumnString(String s) {
+            TreeTableColumn<Item, String> col = new TreeTableColumn<>(s);
+            col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s.toLowerCase()));
+            return col;
+        }
 
+        private static TreeTableColumn<Item, Boolean> getColumnBoolean(String s) {
+            TreeTableColumn<Item, Boolean> col = new TreeTableColumn<>(s);
+            col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s.toLowerCase()));
+            return col;
+        }
+
+        private static TreeTableColumn<Item, Integer> getColumnInt(String s) {
+            TreeTableColumn<Item, Integer> col = new TreeTableColumn<>(s);
+            col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s.toLowerCase()));
+            return col;
+        }   
+    
+    /*__________________________________________________________________________
+    ___  _  _ ___ ___ ____ _  _ ____          _  _ ____ _ _  _ 
+    |__] |  |  |   |  |  | |\ | [__     __    |\/| |__| | |\ | 
+    |__] |__|  |   |  |__| | \| ___]          |  | |  | | | \|
+    __________________________________________________________________________*/
+    
+    //Initializes Buttons
+    private HBox getButtons() {
+        // Starting Button State
+        addButton = new Button("        N / A         "); 
+        addButton.setDisable(true);
+        delButton = new Button("        N / A         "); 
+        delButton.setDisable(true);
+        
+        Button helpButton = new Button("?");
+
+        // Create EventHandler for the Buttons
+        addButton.setOnAction((ActionEvent e) -> {addRow();});
+        delButton.setOnAction((ActionEvent e) -> { deleteRow(); });
+        helpButton.setOnAction((ActionEvent e) -> { Popup.help(); });
+
+        Insets buttonInset = new Insets(0, 0, 0, 6.5);
+        HBox hb = new HBox(20, addButton, delButton, helpButton);
+        hb.setPadding(buttonInset);
+        return hb;
+    }
+
+    // Handles Button Text and Disables
     private void updateButtons(){
         String  sAdd;   String  sDel; 
         Boolean bAdd;   Boolean bDel;
@@ -243,7 +357,7 @@ ______________________________________________________________________________*/
                 sDel = "        N / A         ";    bDel = true;
         } else {
         int sLevel = this.treeTable.getTreeItemLevel(sItem);
-        System.out.println( sItem.getValue().toString()); // DEBUG
+        //System.out.println( sItem.getValue().toString()); // DEBUG
         if (sLevel == 2) {
             //Bulb Selected
             if (sItem.getParent().getValue().getName().equals(allGroupName)) {
@@ -283,32 +397,11 @@ ______________________________________________________________________________*/
         }
     }
 
-    private Button addButton;
-    private Button delButton;
-    private HBox getButtons() {
-        // Create the Buttons
-//        addButton.setFont(new Font("MONOSPACED", 12));
-        addButton = new Button("        N / A         "); addButton.setDisable(true);
-        delButton = new Button("        N / A         "); delButton.setDisable(true);
-        
-        Button helpButton = new Button("?");
-
-        // Create EventHandler for the Buttons
-        addButton.setOnAction((ActionEvent e) -> {addRow();});
-        delButton.setOnAction((ActionEvent e) -> { deleteRow(); });
-        helpButton.setOnAction((ActionEvent e) -> { Popup.help(); });
-
-        Insets buttonInset = new Insets(0, 0, 0, 6.5);
-        HBox hb = new HBox(20, addButton, delButton, helpButton);
-        hb.setPadding(buttonInset);
-        return hb;
-    }
-
-
+    // Handles Addition Button
     private void addRow() {
         TreeItem<Item> sItem = getSelectedItem(); //gets selected item
         int sLevel = this.treeTable.getTreeItemLevel(sItem);
-                        System.out.println("YESSH" + sItem.getParent());
+                        //System.out.println("YESSH" + sItem.getParent());
 
         if (sLevel == 2) {
             //Bulb Selected, add bulb to group/change groupsArr
@@ -336,6 +429,7 @@ ______________________________________________________________________________*/
         }
     }
         
+    // Handles Deletion Button
     private void deleteRow(TreeItem<Item> sItem) {
         int sLevel = this.treeTable.getTreeItemLevel(sItem);
         if (sLevel == 2) {
@@ -360,7 +454,6 @@ ______________________________________________________________________________*/
                 //Group selected, remove all bulbs then remove group, Java GC
                 //RECURSIVEEEEEE YESSSS
                 int x = sItem.getChildren().size();
-                System.out.println(x);
                 for (int i = 0; i < x; i++) {
                     deleteRow(sItem.getChildren().get(0));
                 }
@@ -374,10 +467,48 @@ ______________________________________________________________________________*/
             this.log("ERR103: Unknown delete case, contact elirose@uab.edu.");
         }
     }
-    
     private void deleteRow() {
         TreeItem<Item> selectedItem = this.getSelectedItem();
         this.deleteRow(selectedItem);
+    }
+    
+    /*__________________________________________________________________________
+    ___  _  _ ___ ___ ____ _  _ ____          ____ _  _ _  _ 
+    |__] |  |  |   |  |  | |\ | [__     __    |__| |  |  \/  
+    |__] |__|  |   |  |__| | \| ___]          |  | |__| _/\_ 
+    __________________________________________________________________________*/
+    // Auxillary Button functions, used to add, create, edit, etc.
+    
+    //Notes on Editing Functions
+    //Add and Remove are PURE functions; use change in most cases, which uses
+    //Remove and Add
+    //addRow | deleteRow -> changeBulbParen -> addBulbToGroup | removeBulbFrom-
+    
+    private void addBulbToGroup(TreeItem<Item> bulb, TreeItem<Item> group) {
+        group.getChildren().add(bulb);      // Front-end add bulb
+        (group.getValue()).addBulb((Bulb)bulb.getValue());  // Back-end add bulb
+        editItem(bulb);                     // Selects bulbs
+    }
+    private void addBulbToGroup(TreeItem<Item> bulb) {
+        TreeItem<Item> group = this.getSelectedItem();
+        this.addBulbToGroup(bulb, group);
+    }
+    
+    private void removeBulbFromGroup(TreeItem<Item> bulb) {
+        TreeItem<Item> parent = bulb.getParent();
+        (parent.getValue()).removeBulb((Bulb)bulb.getValue()); //Backend
+        parent.getChildren().remove(bulb);  //Frontend
+    }
+    private void removeBulbFromGroup() {
+        removeBulbFromGroup(getSelectedItem());
+    }
+    
+    private void changeBulbParent(TreeItem<Item> bulb, TreeItem<Item>newParent){
+        removeBulbFromGroup(bulb);
+        this.addBulbToGroup(bulb, newParent);
+    }
+    private void changeBulbParent(TreeItem<Item> newParent) {
+        this.changeBulbParent(getSelectedItem(), newParent);
     }
     
     private void createItem() {
@@ -401,53 +532,21 @@ ______________________________________________________________________________*/
         
         editItem(item);
     }
-        
     private void createItem(String name) {
         this.createItem();
         ((Item)this.getSelectedItem().getValue()).setName(name);
     }
 
-    private void addNewRootItem() {
-        TreeItem<Item> item = new TreeItem<>(new Item("Groups"));
-        treeTable.setRoot(item);
-        this.editItem(item);
-    }
-//Add and Remove are PURE functions; use change in most cases, which uses
-    //Remove and Add
-    //addRow | deleteRow -> changeBulbParen -> addBulbToGroup | removeBulbFrom-
-    
-    private void removeBulbFromGroup(TreeItem<Item> bulb) {
-        System.out.println(bulb);
-        System.out.println(bulb.getParent());
-        TreeItem<Item> parent = bulb.getParent();
-        (parent.getValue()).removeBulb((Bulb)bulb.getValue()); //Backend
-        parent.getChildren().remove(bulb);  //Frontend
-    }
-    
-    private void removeBulbFromGroup() {
-        removeBulbFromGroup(getSelectedItem());
-    }
 
-    private void addBulbToGroup(TreeItem<Item> bulb, TreeItem<Item> group) {
-        group.getChildren().add(bulb);      // Front-end add bulb
-        (group.getValue()).addBulb((Bulb)bulb.getValue());   // Back-end add bulb
-        editItem(bulb);                     // Selects bulbs
-    }
-    
-    private void addBulbToGroup(TreeItem<Item> bulb) {
-        TreeItem<Item> group = this.getSelectedItem();
-        this.addBulbToGroup(bulb, group);
-    }
+    /*__________________________________________________________________________
+    ____ ___ _  _ ____ ____ 
+    |  |  |  |__| |___ |__/ 
+    |__|  |  |  | |___ |  \ 
+    __________________________________________________________________________*/ 
 
-    private void changeBulbParent(TreeItem<Item> bulb, TreeItem<Item> newParent) {
-        removeBulbFromGroup(bulb);
-        this.addBulbToGroup(bulb, newParent);
-    }
-
-    private void changeBulbParent(TreeItem<Item> newParent) {
-        this.changeBulbParent(getSelectedItem(), newParent);
-    }
+    // ITEM MANAGEMENT--------------------------
     
+    // Serves to "Focus" on Items
     private void editItem(TreeItem<Item> item) {
         // Scroll to the new item
         int newRowIndex = treeTable.getRow(item);
@@ -459,11 +558,11 @@ ______________________________________________________________________________*/
         treeTable.getFocusModel().focus(newRowIndex, firstCol);
         treeTable.edit(newRowIndex, firstCol);
     }
-    
 
-    
+    // Simplifies logic in many parts of the code
     private TreeItem<Item> getSelectedItem() {
-        TreeTableView.TreeTableViewSelectionModel sm = this.treeTable.getSelectionModel();
+        TreeTableView.TreeTableViewSelectionModel sm = 
+                this.treeTable.getSelectionModel();
         if (sm.isEmpty()) {
             this.log("Select a row.");
             return null;
@@ -471,7 +570,9 @@ ______________________________________________________________________________*/
         return (TreeItem)sm.getSelectedItem();
     }
 
-    private TreeItem<Item> getItemByName(String name, List<TreeItem<Item>> itemsArr) {
+    // Names are unique; may be replaced with getItemByUid in the future
+    private TreeItem<Item> getItemByName(String name, List<TreeItem<Item>> 
+            itemsArr) {
         for (int i = 0; i < itemsArr.size(); i++) {
             if ((itemsArr.get(i).getValue()).getName().equals(name)) {
                 return itemsArr.get(i);
@@ -481,6 +582,8 @@ ______________________________________________________________________________*/
         this.log("ERR104: No item by the name " + name + ".");
         return null;
     }
+    
+    //LIST MANAGEMENT------------------------
     
     private ArrayList<String> getNameList(List<TreeItem<Item>> itemsArr) {
         ArrayList<String> L = new ArrayList();
@@ -498,25 +601,10 @@ ______________________________________________________________________________*/
         return treeTable.getRoot().getChildren();
     }
     
-    public static TreeTableColumn<Item, String> getColumnString(String s) {
-        TreeTableColumn<Item, String> col = new TreeTableColumn<>(s);
-        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
-        return col;
-    }
-    
-    public static TreeTableColumn<Item, Boolean> getColumnBoolean(String s) {
-        TreeTableColumn<Item, Boolean> col = new TreeTableColumn<>(s);
-        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
-        return col;
-    }
-    
-    public static TreeTableColumn<Item, Integer> getColumnInt(String s) {
-        TreeTableColumn<Item, Integer> col = new TreeTableColumn<>(s);
-        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
-        return col;
-    }   
+    //LOG--------------------------------
     
     private void log(String message) {
-        this.textarea.appendText(message + "\n");
+       logLabel.setText(message + "\n");
     }
-}
+}//_____________________________________________________________________________
+//===========================THE_END============================================

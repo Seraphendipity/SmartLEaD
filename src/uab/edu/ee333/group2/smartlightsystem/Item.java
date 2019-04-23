@@ -50,7 +50,7 @@ public class Item {
         } else {
             this.name = new SimpleStringProperty(newName);
         }
-        this.color = new SimpleStringProperty("White");
+        this.color = new SimpleStringProperty("black");
         this.status = new SimpleBooleanProperty(false);
         this.brightness = new SimpleIntegerProperty(5);
     }
@@ -110,7 +110,6 @@ public class Item {
    
 
     public void setColor(String color) {
-        System.out.println("MY COLOR IS " + color);
         this.color.set(color);
     }
     

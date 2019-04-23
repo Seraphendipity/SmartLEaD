@@ -48,9 +48,12 @@ public class Group extends Item {
         }
     }
 
+    
+    @Override
     public void setColor(String color) {
         super.setColor(color);
         for (int i = 0; i < this.bulbsArr.size(); ++i) {
+            System.out.println(bulbsArr.get(i));
             this.bulbsArr.get(i).setColor(color);
         }
     }
