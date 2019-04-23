@@ -14,6 +14,13 @@
 package uab.edu.ee333.group2.smartlightsystem;
 //import javafx.beans.ObservableValue;
 
+import java.util.ArrayList;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableStringValue;
 import javafx.beans.value.ObservableValue;
 
@@ -24,29 +31,41 @@ import javafx.beans.value.ObservableValue;
  */
 public class Item {
     protected int uid;
-    protected String name;
-    protected Boolean status = false;
-    protected int brightness = 5;
-    protected String color = "White";
+    protected SimpleStringProperty name;
+    protected SimpleBooleanProperty status;
+    protected SimpleIntegerProperty brightness;
+    protected SimpleStringProperty color;
     protected static int serialCounter = 0;
+    ArrayList<Bulb> bulbsArr = new ArrayList();
+
 
     public Item() {
-        this.uid = serialCounter++;
-        this.name = "Item_" + this.uid;
+        this("");
     }
 
     public Item(String newName) {
-        new Item();
-        this.name = newName;
+        this.uid = serialCounter++;
+        if ( (newName.isEmpty()) || (newName.trim().length() <= 0) ) {
+            this.name = getDefaultName();
+        } else {
+            this.name = new SimpleStringProperty(newName);
+        }
+        this.color = new SimpleStringProperty("White");
+        this.status = new SimpleBooleanProperty(false);
+        this.brightness = new SimpleIntegerProperty(5);
     }
 
+    public SimpleStringProperty getDefaultName() {
+        return new SimpleStringProperty("Item_" + uid);
+    }
+    
     public String toString() {
-        return "Bulb{uid=" + this.uid + ", name=" + this.name + ", bOn=" + this.status + ", brightness=" + this.brightness + ", color=" + this.color + "}";
+        return "Bulb{uid=" + getUid() + ", name=" + getName() + ", bOn=" + getStatus() + ", brightness=" + getBrightness() + ", color=" + getColor() + "}";
     }
     
     public String toCsv(String parent) {
         char c = ','; //delimiter
-        return (this.name + c + this.uid + c + this.status + c + this.brightness + c + this.color + c + parent);
+        return (getName() + c + getUid() + c + getStatus() + c + getBrightness() + c + getColor() + c + parent);
     }
 
     public int getUid() {
@@ -54,27 +73,27 @@ public class Item {
     }
 
     public String getName() {
-        return this.name;
+        return this.name.get();
     }
 
     public Boolean getStatus() {
-        return this.status;
+        return this.status.get();
     }
 
     public int getBrightness() {
-        return this.brightness;
+        return this.brightness.get();
     }
 
     public String getColor() {
-        return this.color;
+        return this.color.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public void setStatus(Boolean status) {
-        this.status = status;
+        this.status.set(status);
     }
     
     public void turnOn() {
@@ -86,14 +105,38 @@ public class Item {
     }
 
     public void setBrightness(int brightness) {
-        this.brightness = brightness;
+        this.brightness.set(brightness);
     }
    
 
     public void setColor(String color) {
         System.out.println("MY COLOR IS " + color);
-        this.color = color;
+        this.color.set(color);
     }
+    
+    public void addBulb(Bulb bulb) {
+        this.bulbsArr.add(bulb);
+    }
+
+    public void removeBulb(Bulb bulb) {
+        this.bulbsArr.remove((Object)bulb);
+    }
+    
+    public StringProperty nameProperty() {
+        return this.name;
+    }
+    public StringProperty colorProperty() {
+        return this.color;
+    }
+    public IntegerProperty brightnessProperty() {
+        return this.brightness;
+    }
+    public BooleanProperty statusProperty() {
+        return this.status;
+    }
+    
+    
+    
     
 //    public ObservableStringValue<> colorProperty() {
 ////        ObservableStringValue oColor = new ObservableStringValue();

@@ -2,10 +2,8 @@
  * File: Controller.java
  * Author: Kyle A. Roberson kylerob@uab.edu
  * Assignment:  Controller - EE333 Spring 2019
- * Vers: 
- * 1.0.0 04/20/2019 KAR - initial coding
- *
- * Credits:  (if any for sections of code)
+ * Vers: 1.
+ *       1.0.0 04/20/2019 KAR - initial coding
  */
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -40,24 +38,26 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.geometry.Insets;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 
 public class Controller extends Application {
-    // Create the TreeTableView
-    private String allGroupName = "Misc. Bulbs";
+    
+/*______________________________________________________________________________
+    _ _  _ _ ___ _ ____ _    _ ___  ____ ___ _ ____ _  _ 
+    | |\ | |  |  | |__| |    |   /  |__|  |  | |  | |\ | 
+    | | \| |  |  | |  | |___ |  /__ |  |  |  | |__| | \| 
+______________________________________________________________________________*/
+
     private TreeItem<Item> allGroup;
-
+    private String allGroupName;
+    private Label dirLabel; // Displays directions up top.
+    private Label logLabel; //Displays log at bottom.
     private final TreeTableView<Item> treeTable = new TreeTableView<>();
-    // Create a TextArea
     private final TextArea textarea = new TextArea();
-
-    // ArrayList of the free Bulbs
-    ArrayList<TreeItem<Item>> freeBulbsArr = new ArrayList();
-    // ArrayList of the groupsArr
-    ArrayList<TreeItem<Item>> groupsArr = new ArrayList<>();
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -65,32 +65,36 @@ public class Controller extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Create the Root Node
-        TreeItem<Item> rootNode = TreeTableUtil.getModel(allGroupName);
-        rootNode.setExpanded(true);
+        //Initialize treeTable, Root and Misc. Group
+        TreeItem<Item> rootNode = new TreeItem<>(new Item("HUB"));
+        allGroupName = "MISC. BULBS";
+        allGroup = new TreeItem<>(new Item(allGroupName));
+        rootNode.getChildren().add(allGroup);
+        
         treeTable.setRoot(rootNode);
         rootNode.setExpanded(true);
         treeTable.setPrefWidth(480);
         treeTable.setEditable(true);
         treeTable.getSelectionModel().selectFirst();
-        
-        for (int i = 0; i < treeTable.getRoot().getChildren().size(); i++) {
-            groupsArr.add(treeTable.getRoot().getChildren().get(i));
-        }
-        
-        this.allGroup = getItemByName(allGroupName, groupsArr);
-        
+     
+        /*---------------------------------
+        __ _ ____ _  _ ____
+        | \| |--| |\/| |===
+        ----------------------------------*/        
         // NAME
 //        ObservableList<Item> data = 
         TreeTableView<Item> tableView = new TreeTableView<>();
         
-        TreeTableColumn<Item, String> NameColumn = TreeTableUtil.getColumnString("Name");
+        TreeTableColumn<Item, String> NameColumn = getColumnString("Name");
         NameColumn.setCellFactory(TextFieldTreeTableCell.<Item>forTreeTableColumn());
-        NameColumn.setEditable(false);
+        NameColumn.setEditable(true);
 
-       
         
-        TreeTableColumn<Item, String> ColorColumn = TreeTableUtil.getColumnString("Color");
+        /*---------------------------------
+        ____ ____ _    ____ ____
+        |___ [__] |___ [__] |--<
+        ----------------------------------*/
+        TreeTableColumn<Item, String> ColorColumn = getColumnString("Color");
         ColorColumn.setCellFactory((TreeTableColumn<Item, String> param) -> {
             TreeTableCell<Item, String> cell = new TreeTableCell<Item, String>() {
                 private ColorPicker colorPicker = new ColorPicker();
@@ -116,15 +120,19 @@ public class Controller extends Application {
             sItem.getValue().setColor(ColorColumn.getCellData(sItem));
         });
 
+        /*---------------------------------
+        ____ ___ ____ ___ _  _ ____
+        ====  |  |--|  |  |__| ====
+        ----------------------------------*/
         //STATECOLUMN
 //        ObservableList<String> list = FXCollections.observableArrayList();
-        String sOff = "Off";
+        String sOff = "IO";
         String sOn = "On ";
-        Image imgOff = new Image("/bulbOff.png");
-        Image imgOn = new Image("/bulbOn.png");
-        ImageView img = new ImageView(imgOff);
+        //Image imgOff = new Image("/bulbOff.png");
+        //Image imgOn = new Image("/bulbOn.png");
+        //ImageView img = new ImageView(imgOff);
         //C:\Users\Elijah\Documents\CoolBeansProjects\SmartLEaD\src
-        TreeTableColumn<Item, Boolean> StateColumn = TreeTableUtil.getColumnBoolean("Status");
+        TreeTableColumn<Item, Boolean> StateColumn = getColumnBoolean("Status");
         StateColumn.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
             TreeTableCell<Item, Boolean> cell = new TreeTableCell<Item, Boolean>() {
                 private final ToggleButton tButton = new ToggleButton(sOff);
@@ -152,18 +160,19 @@ public class Controller extends Application {
             //if (StateColumn.getCellData(sItem) == true) {
             //}
         });
-        
   
-        
-        
-        
+        /*---------------------------------
+        ___  ____ _ ____ _  _ ___ __ _ ____ ____ ____
+        |==] |--< | |__, |--|  |  | \| |=== ==== ====
+        ----------------------------------*/
+    
         //BRIGHTNESS
-        ObservableList<String> listBrightness = FXCollections.observableArrayList();
-        for (int i = 1; i <= 10; i++) {
-            listBrightness.add(Integer.toString(i));
+        ObservableList<Integer> listBrightness = FXCollections.observableArrayList();
+        for (int i = 1; i <= 11; i++) {
+            listBrightness.add(i);
         }
-        TreeTableColumn<Item, Integer> BrightnessColumn = TreeTableUtil.getColumnInt("Brightness");
-        BrightnessColumn.setCellFactory((TreeTableColumn<Item, Integer> param) -> {
+        TreeTableColumn<Item, Integer> BrightnessColumn = getColumnInt("Brightness");
+        BrightnessColumn.setCellFactory((TreeTableColumn<Item, Integer> p) -> {
             TreeTableCell<Item, Integer> cell = new TreeTableCell<Item, Integer>() {
                 private ComboBox comboBrightnessbox = new ComboBox(listBrightness);
                 
@@ -188,63 +197,53 @@ public class Controller extends Application {
         
         });
         
-        
-        //MOUSE EVENT
-        //https://stackoverflow.com/questions/15792090/javafx-treeview-item-action-event/26714930
-        treeTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> MouseEvent(newValue));
-        
-
-        //TRY 01
-//        treeTable.addEventHandler(MouseEvent.MOUSE_CLICKED, mEHandle);
-//    EventHandler<MouseEvent> mEHandle = (MouseEvent e) -> {
-//        //CHANGE BUTTONS
-//        Node node = e.getPickResult().getIntersectedNode();
-//        // Accept clicks only on node cells, and not on empty spaces of the TreeView
-//        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
-//        String name = (String) ((TreeItem)treeView.getSelectionModel().getSelectedItem()).getValue();
-//        System.out.println("Node click: " + name);
-//    }
-//    };        
-        
+        /*---------------------------------
+        ____ ___ _  _ ____ ____
+        [__]  |  |--| |=== |--<
+        ----------------------------------*/
+        //Selection Model Observation Setup
+        treeTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {updateButtons();}                });
 
         // Add Columns to The TreeTableView
-        treeTable.getColumns().add(NameColumn);
-        treeTable.getColumns().add(ColorColumn);
-        treeTable.getColumns().add(StateColumn);
-        treeTable.getColumns().add(BrightnessColumn);
-
-        // Add a placeholder to the TreeTableView.
-        // It is displayed when the root node is deleted.
-        treeTable.setPlaceholder(new Label("Click the Add button to add a row."));
+        treeTable.getColumns().addAll(NameColumn, 
+                                      ColorColumn, 
+                                      StateColumn, 
+                                      BrightnessColumn);
 
         // Create the Label
-        Label label = new Label("  Please select a group or bulb to add/delete.");
+        dirLabel = new Label("  Please select a group or bulb to add/delete.");
 
-        // Create the HBox
+        // Organizing Boxes
         HBox hbox = this.getButtons();
-        // Create the VBox
-        VBox root = new VBox(label, hbox, treeTable);
+        VBox root = new VBox(dirLabel, hbox, treeTable);
         root.setSpacing(10);
 
-        // Create the Scene
-        Scene scene = new Scene(root);
-        // Add the Scene to the Stage
-        stage.setScene(scene);
-        // set unsizable
-        stage.setResizable(false);
-        // Set the Title
-        stage.setTitle("Smart Bulb System");
-        // display group members
-        Label groupLabel = new Label(" Group 2 - Caleb Rudolph, Kyle Roberson, Elijah Rose");
-        root.getChildren().add(groupLabel);
+        
+        Scene scene = new Scene(root);  // Create the Scene
+        stage.setScene(scene);          // Add the Scene to the Stage
+        stage.setResizable(false);      // Set Unsizable
+        stage.setTitle("SmartLEaD");    // Set title
+        
+        String s = "\" Group 2 - Caleb Rudolph, Kyle Roberson, Elijah Rose\"";
+        logLabel = new Label(s);
+        root.getChildren().add(logLabel);
         // Display the Stage
         stage.show();
     }
-    private void MouseEvent(Object newValue) {
-        TreeItem<Item> sItem = getSelectedItem(); //gets selected item
-        int sLevel = this.treeTable.getTreeItemLevel(sItem);
+    //private void MouseEvent(Object newValue) {
+
+    private void updateButtons(){
         String  sAdd;   String  sDel; 
         Boolean bAdd;   Boolean bDel;
+        TreeItem<Item> sItem = getSelectedItem(); //gets selected item
+        if(sItem == null) {
+                sAdd = "        N / A         ";    bAdd = true; 
+                sDel = "        N / A         ";    bDel = true;
+        } else {
+        int sLevel = this.treeTable.getTreeItemLevel(sItem);
+        System.out.println( sItem.getValue().toString()); // DEBUG
         if (sLevel == 2) {
             //Bulb Selected
             if (sItem.getParent().getValue().getName().equals(allGroupName)) {
@@ -281,10 +280,8 @@ public class Controller extends Application {
         addButton.setDisable(bAdd);
         delButton.setText(sDel);
         delButton.setDisable(bDel);
-        
+        }
     }
-    
-    
 
     private Button addButton;
     private Button delButton;
@@ -311,10 +308,12 @@ public class Controller extends Application {
     private void addRow() {
         TreeItem<Item> sItem = getSelectedItem(); //gets selected item
         int sLevel = this.treeTable.getTreeItemLevel(sItem);
+                        System.out.println("YESSH" + sItem.getParent());
+
         if (sLevel == 2) {
             //Bulb Selected, add bulb to group/change groupsArr
-            String newParent = Popup.addBulbToGroup(getNameList(groupsArr));
-            changeBulbParent(getItemByName(newParent, groupsArr));
+            String newParent = Popup.addBulbToGroup(getNameList(getGroups()));
+            changeBulbParent(getItemByName(newParent, getGroups()));
             
         } else if (sLevel == 1) {
             //Group Selected
@@ -324,9 +323,9 @@ public class Controller extends Application {
                 this.createItem(s);
             } else {
                 //Group selected, add to the group a bulb from misc. bulbs
-                System.out.println(freeBulbsArr);
-                String n = Popup.addToGroupBulb(getNameList(freeBulbsArr));
-                this.addBulbToGroup(sItem, getItemByName(n, freeBulbsArr));
+                //System.out.println(freeBulbsArr);
+                String n = Popup.addToGroupBulb(getNameList(getFreeBulbs()));
+                this.changeBulbParent(getItemByName(n, getFreeBulbs()), sItem);
             }           
         } else if (sLevel == 0) {
             //Root Selected, create new group
@@ -360,8 +359,10 @@ public class Controller extends Application {
             } else {
                 //Group selected, remove all bulbs then remove group, Java GC
                 //RECURSIVEEEEEE YESSSS
-                for (int i = 0; i < sItem.getChildren().size(); i++) {
-                    deleteRow(sItem.getChildren().get(i));
+                int x = sItem.getChildren().size();
+                System.out.println(x);
+                for (int i = 0; i < x; i++) {
+                    deleteRow(sItem.getChildren().get(0));
                 }
                 sItem.getParent().getChildren().remove(sItem);
             }           
@@ -384,14 +385,12 @@ public class Controller extends Application {
         TreeItem<Item> item = null;
         switch (this.treeTable.getTreeItemLevel(selectedItem)) {
             case 1: {
-                item = new TreeItem((Object)new Bulb());
-                freeBulbsArr.add(item);
+                item = new TreeItem(new Bulb());
                 addBulbToGroup(item, allGroup);
                 break;
             }
             case 0: {
-                item = new TreeItem((Object)new Group());
-                groupsArr.add(item);
+                item = new TreeItem(new Group());
                 selectedItem.getChildren().add(item);
                 break;
             }
@@ -418,9 +417,11 @@ public class Controller extends Application {
     //addRow | deleteRow -> changeBulbParen -> addBulbToGroup | removeBulbFrom-
     
     private void removeBulbFromGroup(TreeItem<Item> bulb) {
+        System.out.println(bulb);
+        System.out.println(bulb.getParent());
         TreeItem<Item> parent = bulb.getParent();
-        ((Group)parent.getValue()).removeBulb((Bulb)bulb.getValue()); //Backend
-        parent.getChildren().remove(bulb);                           //Frontend
+        (parent.getValue()).removeBulb((Bulb)bulb.getValue()); //Backend
+        parent.getChildren().remove(bulb);  //Frontend
     }
     
     private void removeBulbFromGroup() {
@@ -429,7 +430,7 @@ public class Controller extends Application {
 
     private void addBulbToGroup(TreeItem<Item> bulb, TreeItem<Item> group) {
         group.getChildren().add(bulb);      // Front-end add bulb
-        ((Group)group.getValue()).addBulb((Bulb)bulb.getValue());   // Back-end add bulb
+        (group.getValue()).addBulb((Bulb)bulb.getValue());   // Back-end add bulb
         editItem(bulb);                     // Selects bulbs
     }
     
@@ -470,7 +471,7 @@ public class Controller extends Application {
         return (TreeItem)sm.getSelectedItem();
     }
 
-    private TreeItem<Item> getItemByName(String name, ArrayList<TreeItem<Item>> itemsArr) {
+    private TreeItem<Item> getItemByName(String name, List<TreeItem<Item>> itemsArr) {
         for (int i = 0; i < itemsArr.size(); i++) {
             if ((itemsArr.get(i).getValue()).getName().equals(name)) {
                 return itemsArr.get(i);
@@ -481,13 +482,39 @@ public class Controller extends Application {
         return null;
     }
     
-    private ArrayList<String> getNameList(ArrayList<TreeItem<Item>> itemsArr) {
+    private ArrayList<String> getNameList(List<TreeItem<Item>> itemsArr) {
         ArrayList<String> L = new ArrayList();
         for (int i = 0; i < itemsArr.size(); i++) {
             L.add(itemsArr.get(i).getValue().getName());
         }
         return L;
     }
+    
+    private List<TreeItem<Item>> getFreeBulbs() {
+        return allGroup.getChildren();
+    }
+    
+    private List<TreeItem<Item>> getGroups() {
+        return treeTable.getRoot().getChildren();
+    }
+    
+    public static TreeTableColumn<Item, String> getColumnString(String s) {
+        TreeTableColumn<Item, String> col = new TreeTableColumn<>(s);
+        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
+        return col;
+    }
+    
+    public static TreeTableColumn<Item, Boolean> getColumnBoolean(String s) {
+        TreeTableColumn<Item, Boolean> col = new TreeTableColumn<>(s);
+        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
+        return col;
+    }
+    
+    public static TreeTableColumn<Item, Integer> getColumnInt(String s) {
+        TreeTableColumn<Item, Integer> col = new TreeTableColumn<>(s);
+        col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s));
+        return col;
+    }   
     
     private void log(String message) {
         this.textarea.appendText(message + "\n");

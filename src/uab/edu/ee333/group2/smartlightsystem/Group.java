@@ -6,20 +6,18 @@
  */
 
 package uab.edu.ee333.group2.smartlightsystem;
-
-import java.util.ArrayList;
-
 /**
  *
  * @author Elijah Rose elirose@uab.edu
  */
 public class Group extends Item {
-    ArrayList<Bulb> bulbsArr = new ArrayList(3);
-    private static int gSerialCounter = -1;
 
-    public Group() {
-        this.uid = gSerialCounter--;
-        this.name = "Group_" + this.uid;
+    public Group () {
+        super(); 
+    }
+    
+    public Group(String name) {
+        super(name);
     }
 
     public String toString() {
@@ -30,35 +28,32 @@ public class Group extends Item {
     }
 
     public void turnOn() {
-        this.status = true;
+        super.turnOn();
         for (int i = 0; i < this.bulbsArr.size(); ++i) {
             this.bulbsArr.get(i).turnOn();
         }
     }
 
     public void turnOff() {
-        this.status = false;
+        super.turnOff();
         for (int i = 0; i < this.bulbsArr.size(); ++i) {
             this.bulbsArr.get(i).turnOff();
         }
     }
 
     public void setBrightness(int brightness) {
-        this.brightness = brightness;
+        super.setBrightness(brightness);
+        for (int i = 0; i < this.bulbsArr.size(); ++i) {
+            this.bulbsArr.get(i).setBrightness(brightness);
+        }
     }
 
     public void setColor(String color) {
-        this.color = color;
+        super.setColor(color);
         for (int i = 0; i < this.bulbsArr.size(); ++i) {
             this.bulbsArr.get(i).setColor(color);
         }
     }
 
-    public void addBulb(Bulb bulb) {
-        this.bulbsArr.add(bulb);
-    }
 
-    public void removeBulb(Bulb bulb) {
-        this.bulbsArr.remove((Object)bulb);
-    }
 }

@@ -43,7 +43,7 @@ public class Popup extends Controller {
         return window;
     }
 
-    public static String addToGroupBulb(ArrayList<String> bulbsList) {
+    public static String addToGroupBulb(List<String> bulbsList) {
         Stage window = Popup.initializePopup("Add Bulb to Group");
         ComboBox bulbsComboBox = new ComboBox();
         System.out.println(bulbsList);
@@ -72,6 +72,7 @@ public class Popup extends Controller {
         factoryId.setEditable(true);
         factoryId.setPromptText("UID on Bulb Base");
         Button closeButton = new Button("Add");
+        
         closeButton.setOnAction(e -> window.close());
         VBox layout = new VBox(10.0);
         layout.getChildren().addAll(name, closeButton);
@@ -89,6 +90,7 @@ public class Popup extends Controller {
         name.setEditable(true);
         name.setPromptText("Name for Group");
         Button closeButton = new Button("Add Group");
+        
         closeButton.setOnAction(e -> window.close());
         VBox layout = new VBox(10.0);
         layout.getChildren().addAll(name, closeButton);
