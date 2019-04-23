@@ -40,6 +40,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
 
 public class Controller extends Application {
     // Create the TreeTableView
@@ -114,13 +118,16 @@ public class Controller extends Application {
 
         //STATECOLUMN
 //        ObservableList<String> list = FXCollections.observableArrayList();
-        String sOn = "On ";
         String sOff = "Off";
-        
+        String sOn = "On ";
+        Image imgOff = new Image("/bulbOff.png");
+        Image imgOn = new Image("/bulbOn.png");
+        ImageView img = new ImageView(imgOff);
+        //C:\Users\Elijah\Documents\CoolBeansProjects\SmartLEaD\src
         TreeTableColumn<Item, Boolean> StateColumn = TreeTableUtil.getColumnBoolean("Status");
         StateColumn.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
             TreeTableCell<Item, Boolean> cell = new TreeTableCell<Item, Boolean>() {
-                private final ToggleButton tButton = new ToggleButton(sOn);
+                private final ToggleButton tButton = new ToggleButton(sOff);
                 
                 @Override
                 protected void updateItem(Boolean item, boolean empty) {
@@ -142,8 +149,11 @@ public class Controller extends Application {
         StateColumn.setOnEditCommit(e ->{
             TreeItem<Item> sItem = getSelectedItem();
             sItem.getValue().setStatus(StateColumn.getCellData(sItem));
+            //if (StateColumn.getCellData(sItem) == true) {
+            //}
         });
         
+  
         
         
         
@@ -179,6 +189,22 @@ public class Controller extends Application {
         });
         
         
+        //MOUSE EVENT
+        //https://stackoverflow.com/questions/15792090/javafx-treeview-item-action-event/26714930
+        treeTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> MouseEvent(newValue));
+        
+
+        //TRY 01
+//        treeTable.addEventHandler(MouseEvent.MOUSE_CLICKED, mEHandle);
+//    EventHandler<MouseEvent> mEHandle = (MouseEvent e) -> {
+//        //CHANGE BUTTONS
+//        Node node = e.getPickResult().getIntersectedNode();
+//        // Accept clicks only on node cells, and not on empty spaces of the TreeView
+//        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+//        String name = (String) ((TreeItem)treeView.getSelectionModel().getSelectedItem()).getValue();
+//        System.out.println("Node click: " + name);
+//    }
+//    };        
         
 
         // Add Columns to The TreeTableView
@@ -196,7 +222,6 @@ public class Controller extends Application {
 
         // Create the HBox
         HBox hbox = this.getButtons();
-
         // Create the VBox
         VBox root = new VBox(label, hbox, treeTable);
         root.setSpacing(10);
@@ -214,40 +239,70 @@ public class Controller extends Application {
         root.getChildren().add(groupLabel);
         // Display the Stage
         stage.show();
-
     }
+    private void MouseEvent(Object newValue) {
+        TreeItem<Item> sItem = getSelectedItem(); //gets selected item
+        int sLevel = this.treeTable.getTreeItemLevel(sItem);
+        String  sAdd;   String  sDel; 
+        Boolean bAdd;   Boolean bDel;
+        if (sLevel == 2) {
+            //Bulb Selected
+            if (sItem.getParent().getValue().getName().equals(allGroupName)) {
+                //+ Add Bulb to Hub | - Remove Bulb from Hub 
+                sAdd = "        N / A         ";    bAdd = true; 
+                sDel = " Remove Bulb from Hub ";    bDel = false;
+            } else {
+                //+ Greyed Out | - Remove Bulb from Group
+                sAdd = "        N / A         ";    bAdd = true; 
+                sDel = "Remove Bulb from Group";    bDel = false;
+            }
+        } else if (sLevel == 1) {
+            //Group Selected
+            if ( sItem.getValue().getName().equals(this.allGroupName) ) {
+                //+ Add Bulb to System |- N/A
+                sAdd = " Connect Bulb to Hub  ";    bAdd = false; 
+                sDel = "        N / A         ";    bDel = true; 
+            } else {
+                //+ Add Bulb to Group | - Delte Group
+                sAdd = "  Add Bulb to Group   ";    bAdd = false; 
+                sDel = "     Delete Group     ";    bDel = false;  
+            }           
+        } else if (sLevel == 0) {
+            //Root Selected: + Add New Group | Disconnect from HUB
+                sAdd = "    Add New Group     ";    bAdd = false; 
+                sDel = " Disconnect from HUB  ";    bDel = true;  
+        } else {
+                sAdd = "        N / A         ";    bAdd = true; 
+                sDel = "        N / A         ";    bDel = true; 
 
-        private HBox getButtons() {
+            // +  ADD | - DELETE
+        }
+        addButton.setText(sAdd);
+        addButton.setDisable(bAdd);
+        delButton.setText(sDel);
+        delButton.setDisable(bDel);
+        
+    }
+    
+    
+
+    private Button addButton;
+    private Button delButton;
+    private HBox getButtons() {
         // Create the Buttons
-        Button addButton = new Button("Add");
-        Button deleteButton = new Button("Delete");
-        Button helpButton = new Button("Help");
+//        addButton.setFont(new Font("MONOSPACED", 12));
+        addButton = new Button("        N / A         "); addButton.setDisable(true);
+        delButton = new Button("        N / A         "); delButton.setDisable(true);
+        
+        Button helpButton = new Button("?");
 
         // Create EventHandler for the Buttons
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                addRow();
-            }
-
-        });
-
-        deleteButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                deleteRow();
-            }
-        });
-        
-        helpButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Popup.help();
-            }
-        });
+        addButton.setOnAction((ActionEvent e) -> {addRow();});
+        delButton.setOnAction((ActionEvent e) -> { deleteRow(); });
+        helpButton.setOnAction((ActionEvent e) -> { Popup.help(); });
 
         Insets buttonInset = new Insets(0, 0, 0, 6.5);
-        HBox hb = new HBox(20, addButton, deleteButton,helpButton);
+        HBox hb = new HBox(20, addButton, delButton, helpButton);
         hb.setPadding(buttonInset);
         return hb;
     }
@@ -271,7 +326,7 @@ public class Controller extends Application {
                 //Group selected, add to the group a bulb from misc. bulbs
                 System.out.println(freeBulbsArr);
                 String n = Popup.addToGroupBulb(getNameList(freeBulbsArr));
-                this.addBulbToGroup(getItemByName(n, freeBulbsArr));
+                this.addBulbToGroup(sItem, getItemByName(n, freeBulbsArr));
             }           
         } else if (sLevel == 0) {
             //Root Selected, create new group
@@ -326,24 +381,26 @@ public class Controller extends Application {
     
     private void createItem() {
         TreeItem<Item> selectedItem = this.getSelectedItem();
-        TreeItem item = null;
+        TreeItem<Item> item = null;
         switch (this.treeTable.getTreeItemLevel(selectedItem)) {
             case 1: {
                 item = new TreeItem((Object)new Bulb());
                 freeBulbsArr.add(item);
+                addBulbToGroup(item, allGroup);
                 break;
             }
             case 0: {
                 item = new TreeItem((Object)new Group());
                 groupsArr.add(item);
+                selectedItem.getChildren().add(item);
                 break;
             }
             default: {
                 this.log("ERR101: Invalid command, contact elirose@uab.edu.");
             }
         }
-        selectedItem.getChildren().add(item);
-        this.editItem(item);
+        
+        editItem(item);
     }
         
     private void createItem(String name) {

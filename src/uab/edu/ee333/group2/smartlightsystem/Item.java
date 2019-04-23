@@ -14,6 +14,10 @@
 package uab.edu.ee333.group2.smartlightsystem;
 //import javafx.beans.ObservableValue;
 
+import javafx.beans.value.ObservableStringValue;
+import javafx.beans.value.ObservableValue;
+
+
 /**
  *
  * @author Elijah Rose elirose@uab.edu
@@ -87,9 +91,14 @@ public class Item {
    
 
     public void setColor(String color) {
+        System.out.println("MY COLOR IS " + color);
         this.color = color;
     }
     
+//    public ObservableStringValue<> colorProperty() {
+////        ObservableStringValue oColor = new ObservableStringValue();
+//        return ObservableStringValue(color);
+//    }
 }
 
 

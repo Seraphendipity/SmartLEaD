@@ -25,45 +25,44 @@ public class TreeTableUtil {
                 
 
             //Creates Root
-            Item person1 = new Item("Groups");
+            TreeItem<Item> rootNode = new TreeItem<Item>(new Item("HUB"));
 
             // Creates Groups
-            Item group1 = new Item("Patio");
-            Item group2 = new Item("Garage");
-            Item group3 = new Item("Den");
-            Item group4 = new Item("Master Bedroom");
-            Item group5 = new Item("Living Room");
-            Item groupMiscBulbs = new Item (allGroupName);
+//            Item group1 = new Item("Patio");
+//            Item group2 = new Item("Garage");
+//            Item group3 = new Item("Den");
+//            Item group4 = new Item("Master Bedroom");
+//            Item group5 = new Item("Living Room");
+            TreeItem<Item> groupMiscBulbs = new TreeItem<Item>(new Item(allGroupName));
 
             //Creates Bulbs
-            Item bulb1 = new Item("Bulb-1");
-            Item bulb2 = new Item("Bulb-2");
-            Item bulb3 = new Item("Bulb-3");
-            Item bulb4 = new Item("Bulb-4");
-            Item bulb5 = new Item("Bulb-5");
+//            Item bulb1 = new Item("Bulb-1");
+//            Item bulb2 = new Item("Bulb-2");
+//            Item bulb3 = new Item("Bulb-3");
+//            Item bulb4 = new Item("Bulb-4");
+//            Item bulb5 = new Item("Bulb-5");
 
 
             // Connects everything
-            TreeItem<Item> group1Node = new TreeItem<>(group1);
-            group1Node.getChildren().addAll(new TreeItem<>(bulb1), new TreeItem<>(bulb2));
+//            TreeItem<Item> group1Node = new TreeItem<>(group1);
+//            group1Node.getChildren().addAll(new TreeItem<>(bulb1), new TreeItem<>(bulb2));
+//
+//            TreeItem<Item> group2Node = new TreeItem<>(group2);
+//            group2Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb3),new TreeItem<>(bulb4));
+//
+//            TreeItem<Item> group3Node = new TreeItem<>(group3);
+//            group3Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb3),new TreeItem<>(bulb4));
+//
+//            TreeItem<Item> group4Node = new TreeItem<>(group4);
+//            group4Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb4),new TreeItem<>(bulb1));
+//
+//            TreeItem<Item> group5Node = new TreeItem<>(group5);
+//            group5Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb1),new TreeItem<>(bulb5));
 
-            TreeItem<Item> group2Node = new TreeItem<>(group2);
-            group2Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb3),new TreeItem<>(bulb4));
-
-            TreeItem<Item> group3Node = new TreeItem<>(group3);
-            group3Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb3),new TreeItem<>(bulb4));
-
-            TreeItem<Item> group4Node = new TreeItem<>(group4);
-            group4Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb4),new TreeItem<>(bulb1));
-
-            TreeItem<Item> group5Node = new TreeItem<>(group5);
-            group5Node.getChildren().addAll(new TreeItem<>(bulb2), new TreeItem<>(bulb1),new TreeItem<>(bulb5));
-
-            TreeItem<Item> groupMiscBulbsNode = new TreeItem<> (groupMiscBulbs);
+//            TreeItem<Item> groupMiscBulbsNode = new TreeItem<> (groupMiscBulbs);
 
             // Create the root node and add children
-            TreeItem<Item> rootNode = new TreeItem<>(person1);
-            rootNode.getChildren().addAll(group1Node, group2Node, group3Node,group4Node, group5Node,groupMiscBulbsNode);
+            rootNode.getChildren().add(groupMiscBulbs);
 
 
             return rootNode;
