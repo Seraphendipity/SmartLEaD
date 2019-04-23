@@ -4,7 +4,9 @@
  * Assignment:  SmartLEaD - EE333 Spring 2019
  * Vers: 1.0.0 04/23/2019 ETR - initial coding
  *
- * Credits:  (if any for sections of code)
+ * Credits:  ichael Simmons 
+ * (https://stackoverflow.com/questions/12169116/
+ *   javafx-tableview-with-colorpicker-editor)
  */
 package uab.edu.ee333.group2.smartlightsystem;
 
@@ -12,6 +14,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
@@ -31,7 +34,7 @@ public class ColorPickerCellTreeTable<Item> extends TreeTableCell<Item, Color> {
         this.colorPicker.setOnShowing(event -> {
             final TreeTableView<Item> tableView = getTreeTableView();
             tableView.getSelectionModel().select(getTreeTableRow().getIndex());
-            tableView.edit (tableView.getSelectionModel().getSelectedIndex(), column);       
+            tableView.edit (tableView.getSelectionModel().getSelectedIndex(), column);  
         });
         this.colorPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if(isEditing()) {

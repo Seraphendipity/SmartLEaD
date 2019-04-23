@@ -19,10 +19,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableStringValue;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.paint.Color;
 
 
 /**
@@ -34,7 +36,7 @@ public class Item {
     protected SimpleStringProperty name;
     protected SimpleBooleanProperty status;
     protected SimpleIntegerProperty brightness;
-    protected SimpleStringProperty color;
+    protected SimpleObjectProperty<Color> color;
     protected static int serialCounter = 0;
     ArrayList<Bulb> bulbsArr = new ArrayList();
 
@@ -50,9 +52,11 @@ public class Item {
         } else {
             this.name = new SimpleStringProperty(newName);
         }
-        this.color = new SimpleStringProperty("black");
+        this.color = new SimpleObjectProperty<Color>(Color.WHITE);
         this.status = new SimpleBooleanProperty(false);
         this.brightness = new SimpleIntegerProperty(5);
+//        this.brightness.addListener(ObservableValue<? extends SimpleIntegerProperty> 
+//                brightnessObs, SimpleIntegerProperty ov, SimpleIntegerProperty nv);
     }
 
     public SimpleStringProperty getDefaultName() {
@@ -84,7 +88,7 @@ public class Item {
         return this.brightness.get();
     }
 
-    public String getColor() {
+    public Color getColor() {
         return this.color.get();
     }
 
@@ -106,28 +110,34 @@ public class Item {
 
     public void setBrightness(int brightness) {
         this.brightness.set(brightness);
+
     }
    
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color.set(color);
+        System.out.println("Color is " + color);
     }
     
     public void addBulb(Bulb bulb) {
         this.bulbsArr.add(bulb);
     }
+    
 
     public void removeBulb(Bulb bulb) {
         this.bulbsArr.remove((Object)bulb);
     }
     
     public StringProperty nameProperty() {
+
         return this.name;
     }
-    public StringProperty colorProperty() {
+    public SimpleObjectProperty<Color> colorProperty() {
         return this.color;
     }
     public IntegerProperty brightnessProperty() {
+                        System.out.println("Brightness is " + brightness);
+
         return this.brightness;
     }
     public BooleanProperty statusProperty() {

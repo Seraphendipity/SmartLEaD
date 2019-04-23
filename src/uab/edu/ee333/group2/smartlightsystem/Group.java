@@ -6,6 +6,9 @@
  */
 
 package uab.edu.ee333.group2.smartlightsystem;
+
+import javafx.scene.paint.Color;
+
 /**
  *
  * @author Elijah Rose elirose@uab.edu
@@ -50,7 +53,7 @@ public class Group extends Item {
 
     
     @Override
-    public void setColor(String color) {
+    public void setColor(Color color) {
         super.setColor(color);
         for (int i = 0; i < this.bulbsArr.size(); ++i) {
             System.out.println(bulbsArr.get(i));

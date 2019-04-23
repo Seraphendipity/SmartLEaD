@@ -81,13 +81,10 @@ ______________________________________________________________________________*/
         treeTable.setPrefWidth(480);
         treeTable.setEditable(true);
         treeTable.getSelectionModel().selectFirst();
-     
         /*---------------------------------
         __ _ ____ _  _ ____
         | \| |--| |\/| |===
         ----------------------------------*/        
-        // NAME
-        
         TreeTableColumn<Item, String> nameCol = getColumnString("Name");
         nameCol.setCellFactory(
                 TextFieldTreeTableCell.<Item>forTreeTableColumn());
@@ -98,95 +95,15 @@ ______________________________________________________________________________*/
         ____ ____ _    ____ ____
         |___ [__] |___ [__] |--<
         ----------------------------------*/
-        TreeTableColumn<Item, String> ColorColumn = getColumnString("Color");
-        int colorColMode = 0; //0 = combobox | 1 = colorPicker | else = custom
-        
-        if (colorColMode == 0) {
-            ObservableList<String> listColors = FXCollections.observableArrayList();
-            listColors.addAll("White", "Black", "Grey", "Red","Blue","Green");
-            ColorColumn.setCellFactory(ComboBoxTreeTableCell.forTreeTableColumn(listColors));
-            
-        } else if (colorColMode == 1) {
-        ColorColumn.setCellFactory( (TreeTableColumn<Item, String> param) -> {
-            TreeTableCell<Item, String> cell = new TreeTableCell<Item,String>(){
-                private ColorPicker colorPicker = new ColorPicker();
-                        
-
-                @Override
-                public void commitEdit(String t) {
-                    super.commitEdit(t); 
-                    //System.out.println("STUFFFFASfjNASJFNFSNAF");
-
-                }
-                
-                @Override
-                public void startEdit() {
-                    super.startEdit(); 
-                    //System.out.println("STUFFFFASfjNASJFNFSNAF");
-
-                }
-                
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setGraphic(null);
-                    } else {
-                   // System.out.println("nhemmm");
-                        setGraphic(colorPicker);
-                        colorPicker.setValue(Color.valueOf(item));
-                    }
-                }
-//                
-            };
-            return cell;
-        });
-//                colorPicker.setOnAction(new EventHandler<TreeTableColumn.CellEditEvent<Item, String>>() {
-//                    
-//                    @Override
-//                    public void handle(TreeTableColumn.CellEditEvent<Item, String> t) {
-//                        System.out.println("STUFFFFASfjNASJFNFSNAF");
-//                        t.getRowValue().getValue().setColor(t.getNewValue());
-//                    }
-//                });
-//                        colorPicsetOnAction(new EventHandler<ActionEvent> {
-//                            @Override
-//                            public void handle(ActionEvent e) {
-//                            
-//                        }
-//                        });
-        } else {
-            ColorColumn.setCellFactory(new Callback<TreeTableColumn<Item, String>, TreeTableCell<Item, String>>() {
-                @Override
-                public TreeTableCell<Item, String> call(TreeTableColumn<Item, String> p) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-            });
-        }
-        
- 
-
-        ColorColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Item, String>>() {
-            @Override
-            public void handle(TreeTableColumn.CellEditEvent<Item, String> t) {
-                //System.out.println("STUFFFFASfjNASJFNFSNAF");
-                t.getRowValue().getValue().setColor(t.getNewValue());
-            }
-        });
-//                    e.getRowValue().getValue().setColor("blue");
-        //*******Possibly how to link gui to backend values*************
-//        ColorColumn.setOnEditCommit(e -> {
-//            e.getRowValue().getValue().setColor("red");
-////            TreeItem<Item> sItem = getSelectedItem();
-////            sItem.getValue().setColor(ColorColumn.getCellData(sItem));
-//        });
-
+        TreeTableColumn<Item, Color> colorCol = getColumnColor("Color");
+        colorCol.setCellFactory((TreeTableColumn<Item, Color> param) -> {
+             return new ColorPickerCellTreeTable(colorCol);});
         /*---------------------------------
         ____ ___ ____ ___ _  _ ____
         ====  |  |--|  |  |__| ====
         ----------------------------------*/
-        TreeTableColumn<Item, Boolean> StateColumn = getColumnBoolean("Status");
-        StateColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(StateColumn));
+        TreeTableColumn<Item, Boolean> statusCol = getColumnBoolean("Status");
+        statusCol.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(statusCol));
         //STATECOLUMN
 //        ObservableList<String> list = FXCollections.observableArrayList();
 //        String sOff = "Off";
@@ -195,7 +112,7 @@ ______________________________________________________________________________*/
 //        //Image imgOn = new Image("/bulbOn.png");
 //        //ImageView img = new ImageView(imgOff);
 //        //C:\Users\Elijah\Documents\CoolBeansProjects\SmartLEaD\src
-//        StateColumn.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
+//        statusCol.setCellFactory((TreeTableColumn<Item, Boolean> param) -> {
 //            
 //            TreeTableCell<Item, Boolean> cell = new TreeTableCell<Item, Boolean>() {
 //                
@@ -217,12 +134,12 @@ ______________________________________________________________________________*/
 //            return cell;
 //        });
         
-        StateColumn.setOnEditCommit(e ->{
-            TreeItem<Item> sItem = getSelectedItem();
-            sItem.getValue().setStatus(StateColumn.getCellData(sItem));
-            //if (StateColumn.getCellData(sItem) == true) {
-            //}
-        });
+//        statusCol.setOnEditCommit(e ->{
+//            TreeItem<Item> sItem = getSelectedItem();
+//            sItem.getValue().setStatus(statusCol.getCellData(sItem));
+//            //if (statusCol.getCellData(sItem) == true) {
+//            //}
+//        });
   
         /*---------------------------------
         ___  ____ _ ____ _  _ ___ __ _ ____ ____ ____
@@ -231,7 +148,7 @@ ______________________________________________________________________________*/
     
         //BRIGHTNESS
         ObservableList<Integer> listBrightness = FXCollections.observableArrayList();
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= 10; i++) {
             listBrightness.add(i);
         }
         TreeTableColumn<Item, Integer> BrightnessColumn = getColumnInt("Brightness");
@@ -272,8 +189,8 @@ ______________________________________________________________________________*/
 
         // Add Columns to The TreeTableView
         treeTable.getColumns().addAll(nameCol, 
-                                      ColorColumn, 
-                                      StateColumn, 
+                                      colorCol, 
+                                      statusCol, 
                                       BrightnessColumn);
 
         // Create the Label
@@ -304,6 +221,12 @@ ______________________________________________________________________________*/
     
         private static TreeTableColumn<Item, String> getColumnString(String s) {
             TreeTableColumn<Item, String> col = new TreeTableColumn<>(s);
+            col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s.toLowerCase()));
+            return col;
+        }
+        
+        private static TreeTableColumn<Item, Color> getColumnColor(String s) {
+            TreeTableColumn<Item, Color> col = new TreeTableColumn<>(s);
             col.setCellValueFactory(new TreeItemPropertyValueFactory<>(s.toLowerCase()));
             return col;
         }
